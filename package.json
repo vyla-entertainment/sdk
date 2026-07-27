@@ -1,0 +1,28 @@
+{
+  "name": "@vyla-entertainment/sdk",
+  "version": "1.0.0",
+  "scripts": {
+    "test": "node test/index.js"
+  },
+  "author": "vyla-entertainment",
+  "contributors": [
+    {
+      "name": "GavinGoGaming",
+      "email": "gavin@klash.dev"
+    },
+    {
+      "name": "EndOverdosing"
+    }
+  ],
+  "license": "CC-BY-NC-4.0",
+  "type": "module",
+  "description": "Vyla's multi-provider stream scraper SDK",
+  "main": "src/sdk.js",
+  "directories": {
+    "test": "test"
+  },
+  "keywords": [],
+  "devDependencies": {
+    "dotenv": "^17.4.2"
+  }
+}

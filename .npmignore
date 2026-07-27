@@ -1,0 +1,4 @@
+# npmignore for vyla-sdk in js
+.env
+test/
+node_modules/
