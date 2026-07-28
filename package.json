@@ -24,5 +24,8 @@
   "keywords": [],
   "devDependencies": {
     "dotenv": "^17.4.2"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }

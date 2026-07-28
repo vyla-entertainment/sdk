@@ -10,11 +10,11 @@ const sdk = new VylaSDK({
 });
 
 // 'true' is excludeDisabled
-// const sources = sdk.getSources(true);
-// const source = sources.find(s => s.key === 'lookmovie');
+const sources = sdk.getSources(true);
+const source = sources.find(s => s.key === 'goated');
 
-// const result = await sdk.getStream(source.key, BACKROOMS);
-// console.log("Result:", result.allUrls[0].url);
+const result = await sdk.getStream(source.key, BACKROOMS);
+console.log("Result:", result);
 
 // const tests = {
 //     probeAll(log) {

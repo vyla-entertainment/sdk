@@ -25,7 +25,7 @@ You can now use this to access Vyla's content.
 ```js
 // Get sources
 // Args: excludeDisabled
-sdk.getSources(false);
+sdk.getSources(false); -> {key, timeout, label, ...}[]
 
 // Get subtitles
 // Args: tmdb id, season?, episode?
@@ -37,4 +37,8 @@ await sdk.probeSource('nebula'); -> {ok, ms}
 
 // Probe & test all sources
 await sdk.probeAllSources(); -> {'key': {ok, ms}, ...}
+
+// Get HLS streams
+// Args: source key, tmdb id, season?, episode?, clientIP?
+await sdk.getStream('nebula', '0000000', null, null, null) -> {allUrls: {url, quality, label?, server?, type?, skipProxy?, skipVerify?, headers? ...}[]}
 ```
