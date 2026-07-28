@@ -55,7 +55,7 @@ Original work and core authorship:
 
 [@endoverdosing](https://github.com/EndOverdosing)
 
-[@GavinGoGaming](https://github.com/GavinGoGaming
+[@GavinGoGaming](https://github.com/GavinGoGaming)
 
 Full credits and acknowledgements:
 https://docs.vyla.cc/misc/credit
