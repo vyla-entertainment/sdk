@@ -18,6 +18,7 @@
   "type": "module",
   "description": "Vyla's multi-provider stream scraper SDK",
   "main": "src/sdk.js",
+  "types": "src/sdk.d.ts",
   "directories": {
     "test": "test"
   },
