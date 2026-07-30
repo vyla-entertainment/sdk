@@ -1,3 +1,10 @@
+// Currently active sources reported on 7:47:50 PM PST 7/6/2026
+
+// None Anime Tested: 936075
+// Anime Tested: 37854
+
+// Fshare/Fsonic Tested: 155 ( they don't have Michael )
+
 export const SOURCES = [
     {
         key: '1embed',
@@ -105,6 +112,18 @@ export const SOURCES = [
             Referer: 'https://ani.pm/',
             Origin: 'https://ani.pm',
         },
+    },
+
+    {
+        key: 'cinejoy',
+        label: 'Cinejoy',
+        sourceFile: 'cinejoy',
+        proxyParam: 'cj',
+        timeout: 30000,
+        jitter: 500,
+        retries: 1,
+        multiUrl: true,
+        skipProxy: true,
     },
 
     {
@@ -512,6 +531,7 @@ export const SOURCES = [
         retries: 2,
         skipProxy: true,
     },
+
 ];
 
 export const HEALTH_PROBE_ID = '155';

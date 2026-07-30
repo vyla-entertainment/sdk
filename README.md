@@ -11,36 +11,8 @@ npm install @vyla-entertainment/sdk
 pnpm install @vyla-entertainment/sdk
 ```
 
-## Usage
-Start by creating a VylaSDK element with your TMDB api key.
-```js
-import VylaSDK from "@vyla-entertainment/sdk";
+View our full documentation at https://docs.vyla.cc/sdk
 
-const sdk = new VylaSDK({
-    tmdbApiKey: ...
-});
-```
-
-You can now use this to access Vyla's content.
-```js
-// Get sources
-// Args: excludeDisabled
-sdk.getSources(false); -> {key, timeout, label, ...}[]
-
-// Get subtitles
-// Args: tmdb id, season?, episode?
-await sdk.getSubtitles('0000000', null, null); -> {label, file, type, source}[]
-
-// Probe & test a source
-// Args: source key
-await sdk.probeSource('nebula'); -> {ok, ms}
-
-// Probe & test all sources
-await sdk.probeAllSources(); -> {'key': {ok, ms}, ...}
-
-// Get HLS streams
-// Args: source key, tmdb id, season?, episode?, clientIP?
-await sdk.getStream('nebula', '0000000', null, null, null) -> {allUrls: {url, quality, label?, server?, type?, skipProxy?, skipVerify?, headers? ...}[]}
 ```
 
 # [DMCA](https://docs.vyla.cc/misc/dmca)
