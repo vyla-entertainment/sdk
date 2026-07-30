@@ -2,15 +2,27 @@ import { getTmdbInfo, USER_AGENT } from '../utils/helpers.js';
 
 async function extractVoe(voeUrl) {
     try {
-        const res = await fetch(voeUrl, {
+        let res = await fetch(voeUrl, {
             headers: {
                 'User-Agent': USER_AGENT,
                 'Referer': 'https://anihq.cc/'
             }
         });
 
+        let html = await res.text();
+
+        const redirectMatch = html.match(/window\.location\.href\s*=\s*['"](https?:\/\/[^'"]+)['"]/);
+        if (redirectMatch) {
+            res = await fetch(redirectMatch[1], {
+                headers: {
+                    'User-Agent': USER_AGENT,
+                    'Referer': 'https://anihq.cc/'
+                }
+            });
+            html = await res.text();
+        }
+
         const mirrorUrl = res.url;
-        const html = await res.text();
 
         const scriptMatch = html.match(/<script type="application\/json">\["(.*?)"\]<\/script>/);
         if (!scriptMatch) return null;

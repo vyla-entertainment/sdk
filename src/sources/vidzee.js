@@ -1,70 +1,47 @@
-import { webcrypto } from 'node:crypto';
+// i can't fix this, i'll wait for someone else to fix this lol
+
+import crypto from 'node:crypto';
 import { fetchJson, USER_AGENT } from '../utils/helpers.js';
 
-const PLAYER_URL = 'https://player.vidzee.wtf';
 const CORE_URL = 'https://core.vidzee.wtf';
+const PLAYER_URL = 'https://player.vidzee.wtf';
+const KEY = 'c4a8f1d7e2b9a6c3d0f5e8a1b7c4d9e2';
 
-let cachedKey = null, cachedKeyTs = 0;
-
-async function getDecKey(headers) {
-    const now = Date.now();
-    if (cachedKey && now - cachedKeyTs < 300000) return cachedKey;
-
-    const res = await fetch(`${CORE_URL}/api-key`, {
-        headers,
-        signal: AbortSignal.timeout(7000)
-    });
-    if (!res.ok) throw new Error(`API key fetch failed: ${res.status}`);
-
-    const e = await res.text();
-    const t = Buffer.from(e.replace(/\s+/g, ''), 'base64');
-
-    const s = new Uint8Array(t.length - 28 + 16);
-    s.set(t.subarray(28), 0);
-    s.set(t.subarray(12, 28), t.length - 28);
-
-    const keyMat = await webcrypto.subtle.digest('SHA-256', new TextEncoder().encode('c4a8f1d7e2b9a6c3d0f5e8a1b7c4d9e2'));
-    const key = await webcrypto.subtle.importKey('raw', keyMat, { name: 'AES-GCM' }, false, ['decrypt']);
+function decryptAes(encryptedBase64) {
+    const keyBuf = Buffer.from(KEY, 'utf8');
+    const ciphertext = Buffer.from(encryptedBase64, 'base64');
 
     try {
-        const decrypted = await webcrypto.subtle.decrypt({
-            name: 'AES-GCM',
-            iv: t.subarray(0, 12),
-            tagLength: 128
-        }, key, s);
+        const decipher = crypto.createDecipheriv('aes-256-ecb', keyBuf, null);
+        decipher.setAutoPadding(true);
+        let dec = decipher.update(ciphertext);
+        dec = Buffer.concat([dec, decipher.final()]);
+        const text = dec.toString('utf8');
+        if (text.startsWith('http') || text.includes('{')) return text;
+    } catch { }
 
-        cachedKey = new TextDecoder().decode(decrypted);
-        cachedKeyTs = now;
-        return cachedKey;
-    } catch (err) {
-        throw new Error('Failed to decrypt Vidzee master key');
-    }
-}
-
-function decrypt(enc, key) {
     try {
-        const dec = Buffer.from(enc, 'base64').toString('utf8');
-        const sep = dec.indexOf(':');
-        if (sep === -1) return '';
+        const iv = Buffer.alloc(16, 0);
+        const decipher = crypto.createDecipheriv('aes-256-cbc', keyBuf, iv);
+        decipher.setAutoPadding(true);
+        let dec = decipher.update(ciphertext);
+        dec = Buffer.concat([dec, decipher.final()]);
+        const text = dec.toString('utf8');
+        if (text.startsWith('http') || text.includes('{')) return text;
+    } catch { }
 
-        const ivBase64 = dec.slice(0, sep);
-        const ciphertext = dec.slice(sep + 1);
-        const keyPadded = key.padEnd(32, '\0');
+    try {
+        const iv = ciphertext.subarray(0, 16);
+        const data = ciphertext.subarray(16);
+        const decipher = crypto.createDecipheriv('aes-256-cbc', keyBuf, iv);
+        decipher.setAutoPadding(true);
+        let dec = decipher.update(data);
+        dec = Buffer.concat([dec, decipher.final()]);
+        const text = dec.toString('utf8');
+        if (text.startsWith('http') || text.includes('{')) return text;
+    } catch { }
 
-        const decrypted = CryptoJS.AES.decrypt(
-            ciphertext,
-            CryptoJS.enc.Utf8.parse(keyPadded),
-            {
-                iv: CryptoJS.enc.Base64.parse(ivBase64),
-                mode: CryptoJS.mode.CBC,
-                padding: CryptoJS.pad.Pkcs7
-            }
-        );
-
-        return decrypted.toString(CryptoJS.enc.Utf8) || '';
-    } catch (err) {
-        return '';
-    }
+    return null;
 }
 
 export async function getStream({ id, s, e, clientIP }) {
@@ -77,44 +54,53 @@ export async function getStream({ id, s, e, clientIP }) {
     };
 
     try {
-        const decKey = await getDecKey(headers);
+        const isTv = s != null && e != null;
+        const servers = ['tik', 'ipcloud', 'v6:Hindi'];
+        const results = [];
 
-        const serversToTry = [3, 0, 1, 2, 4, 5, 6, 8];
-
-        for (const sr of serversToTry) {
+        for (const sr of servers) {
             try {
-                const url = `${PLAYER_URL}/api/server?id=${id}&sr=${sr}${s ? `&ss=${s}&ep=${e || 1}` : ''}`;
-                const data = await fetchJson(url, { headers, signal: AbortSignal.timeout(5000) });
+                const url = isTv
+                    ? `${CORE_URL}/streams/tv/${id}/${s}/${e}?s=${encodeURIComponent(sr)}&e=${e}`
+                    : `${CORE_URL}/streams/movie/${id}?s=${encodeURIComponent(sr)}&e=1`;
 
-                if (data?.url?.length) {
-                    for (const entry of data.url) {
-                        if (!entry.link) continue;
+                const data = await fetchJson(url, { headers, signal: AbortSignal.timeout(6000) });
 
-                        const decrypted = decrypt(entry.link, decKey);
-                        if (decrypted?.startsWith('http')) {
+                if (data && data.c) {
+                    const decryptedText = decryptAes(data.c);
+                    if (decryptedText) {
+                        let streamUrl = decryptedText;
+                        let extraHeaders = {};
 
-                            return {
-                                allUrls: [
-                                    {
-                                        url: decrypted,
-                                        skipHlsCheck: true,
-                                        headers: {
-                                            'User-Agent': USER_AGENT,
-                                            'Referer': PLAYER_URL,
-                                            'Origin': PLAYER_URL
-                                        }
-                                    }
-                                ]
-                            };
+                        if (decryptedText.startsWith('{')) {
+                            try {
+                                const parsed = JSON.parse(decryptedText);
+                                streamUrl = parsed.url || parsed.link || parsed.file;
+                                if (parsed.headers) extraHeaders = parsed.headers;
+                            } catch { }
+                        }
+
+                        if (streamUrl && streamUrl.startsWith('http')) {
+                            results.push({
+                                url: streamUrl,
+                                server: `VidZee - ${sr}`,
+                                skipHlsCheck: true,
+                                headers: {
+                                    'User-Agent': USER_AGENT,
+                                    'Referer': PLAYER_URL,
+                                    'Origin': PLAYER_URL,
+                                    ...extraHeaders
+                                }
+                            });
                         }
                     }
                 }
             } catch (err) {
-                continue;
             }
         }
-        return null;
-    } catch (err) {
+
+        return results.length ? { allUrls: results } : null;
+    } catch {
         return null;
     }
 }

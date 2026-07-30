@@ -59,7 +59,6 @@ export interface VylaSDKOptions {
     tmdbApiKey?: string;
 }
 
-// Descriptions written with Claude.
 export default class VylaSDK {
     tmdbApiKey?: string;
 

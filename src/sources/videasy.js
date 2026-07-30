@@ -1,28 +1,24 @@
 import { getTmdbInfo, fetchJson, fetchText, USER_AGENT } from '../utils/helpers.js';
 
-const WINGS_BASE = "https://api.wingsdatabase.com";
+const SPEEDRACE_BASE = "https://api.speedracelight.com";
 const HEADERS = { "Accept": "*/*", "Origin": "https://player.videasy.to", "Referer": "https://player.videasy.to/", "User-Agent": USER_AGENT };
 const SERVERS = [
-    { id: 'jett', name: 'Jett' },
     { id: 'cdn', name: 'Yoru' },
-    { id: 'tejo', name: 'Tejo' },
-    { id: 'neon2', name: 'Neon' },
-    { id: 'ym', name: 'Sage' },
-    { id: 'downloader2', name: 'Cypher' },
     { id: 'm4uhd', name: 'Breach' },
+    { id: 'vsrc', name: 'Neon' },
     { id: 'hdmovie', name: 'Vyse' },
     { id: 'meine', name: 'Killjoy' },
     { id: 'lamovie', name: 'Omen' },
     { id: 'superflix', name: 'Raze' }
 ];
 
-export async function getStream({ id, s, e, server }) {
+export async function getStream({ id, s, e, server, tmdbApiKey }) {
     try {
         const isTv = s != null && e != null;
-        const info = await getTmdbInfo(id, isTv ? 'tv' : 'movie');
+        const info = await getTmdbInfo(tmdbApiKey, id, isTv ? 'tv' : 'movie');
         if (!info?.titles?.length) return null;
 
-        const seedData = await fetchJson(`${WINGS_BASE}/seed?mediaId=${id}`, { headers: HEADERS, signal: AbortSignal.timeout(5000) });
+        const seedData = await fetchJson(`${SPEEDRACE_BASE}/seed?mediaId=${id}`, { headers: HEADERS, signal: AbortSignal.timeout(5000) });
         const seed = seedData?.seed;
         if (!seed) return null;
 
@@ -36,9 +32,7 @@ export async function getStream({ id, s, e, server }) {
         }
 
         const settled = await Promise.allSettled(targets.map(async srv => {
-            if (srv.id === 'cdn' && isTv) throw new Error();
-
-            let url = `${WINGS_BASE}/${srv.id}/sources-with-title?title=${encTitle}&mediaType=${isTv ? 'tv' : 'movie'}&year=${info.year || ''}&tmdbId=${id}&imdbId=${info.imdbId || "tt0000000"}&enc=2&seed=${seed}`;
+            let url = `${SPEEDRACE_BASE}/${srv.id}/sources-with-title?title=${encTitle}&mediaType=${isTv ? 'tv' : 'movie'}&year=${info.year || ''}&tmdbId=${id}&imdbId=${info.imdbId || "tt0000000"}&enc=2&seed=${seed}`;
             if (isTv) url += `&episodeId=${e}&seasonId=${s}`;
 
             const encText = await fetchText(url, { headers: HEADERS, signal: AbortSignal.timeout(10000) });

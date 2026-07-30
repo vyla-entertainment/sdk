@@ -3,13 +3,11 @@ import { USER_AGENT } from '../utils/helpers.js';
 const BASE_URL = "https://1embed.cc";
 
 const PROVIDERS = [
-    { id: "sdev", name: "1Embed - SDev" },
-    { id: "xpa", name: "1Embed - XPass" },
-    { id: "vnes", name: "1Embed - VidNest" },
-    { id: "pro", name: "1Embed - Pro" },
-    { id: "pur", name: "1Embed - Purstream" },
-    { id: "czo", name: "1Embed - Cinezo" },
-    { id: "fas", name: "1Embed - VidFast" }
+    { id: "BUKE", name: "1Embed - BUKE" },
+    { id: "YOTA", name: "1Embed - YOTA" },
+    { id: "NEPT", name: "1Embed - NEPT" },
+    { id: "AZURE", name: "1Embed - AZURE" },
+    { id: "YORU", name: "1Embed - YORU" }
 ];
 
 let cachedToken = null;
@@ -26,6 +24,30 @@ async function getToken() {
         tokenExpiresAt = data.expiresAt;
         return cachedToken;
     } catch { return null; }
+}
+
+function decodeBsUrl(url) {
+    if (!url) return url;
+    let target = url;
+    if (url.includes('d=')) {
+        try {
+            const parts = url.split(/[?&]/);
+            for (const part of parts) {
+                if (part.startsWith('d=')) {
+                    target = decodeURIComponent(part.substring(2));
+                    break;
+                }
+            }
+        } catch { }
+    }
+    if (target.startsWith('bs_')) {
+        try {
+            const decoded = Buffer.from(target.slice(3), 'base64').toString('utf-8');
+            const reversed = decoded.split('').reverse().join('');
+            if (reversed.startsWith('http')) return reversed;
+        } catch { }
+    }
+    return url;
 }
 
 async function fetchProviderStream(provider, type, id, s, e, token) {
@@ -51,11 +73,12 @@ async function fetchProviderStream(provider, type, id, s, e, token) {
         const results = [];
         for (const src of rawSources) {
             if (typeof src !== 'object' || !src) continue;
-            let streamUrl = src.url || src.file || src.link;
-            if (typeof streamUrl !== 'string') continue;
+            let rawUrl = src.url || src.file || src.link;
+            if (typeof rawUrl !== 'string') continue;
+            let streamUrl = decodeBsUrl(rawUrl);
             if (streamUrl.startsWith('/')) streamUrl = `${BASE_URL}${streamUrl}`;
             const isWorker = streamUrl.includes('omena-puu') || streamUrl.includes('nocach') || streamUrl.includes('?p=');
-            const isHls = src.type === 'hls' || streamUrl.includes('m3u8') || isWorker;
+            const isHls = src.type === 'hls' || src.type === 'm3u8' || streamUrl.includes('m3u8') || isWorker;
             if (isHls && !streamUrl.includes('m3u8')) streamUrl += streamUrl.includes('?') ? '&format=.m3u8' : '?format=.m3u8';
             const srcHeaders = (src.headers && typeof src.headers === 'object') ? src.headers : {};
             results.push({
@@ -80,7 +103,7 @@ export async function getStream(args) {
     let targets = PROVIDERS;
     if (server && server !== 'all') {
         const cleanName = server.replace('1Embed - ', '').toLowerCase();
-        targets = PROVIDERS.filter(p => p.id === cleanName || p.name.toLowerCase().includes(cleanName));
+        targets = PROVIDERS.filter(p => p.id.toLowerCase() === cleanName || p.name.toLowerCase().includes(cleanName));
         if (!targets.length) targets = PROVIDERS;
     }
     const settled = await Promise.allSettled(targets.map(p => fetchProviderStream(p, type, id, s, e, token)));

@@ -1,4 +1,4 @@
-// Currently active sources reported on 7:47:50 PM PST 7/6/2026
+// Currently active sources reported on 9:22:41 PM PST 7/30/2026
 
 // None Anime Tested: 936075
 // Anime Tested: 37854
@@ -135,7 +135,7 @@ export const SOURCES = [
         jitter: 500,
         retries: 2,
         multiUrl: true,
-        disabled: true, // Temporarily disabled because their site is down, all streams are returning 403's
+        skipProxy: true,
         cdnHeaders: [{
             pattern: /flix2watch\.pro/i,
             headers: {
@@ -159,18 +159,6 @@ export const SOURCES = [
             'Accept-Language': 'en-US,en;q=0.9',
             Referer: 'https://fsharetv.cc',
         },
-    },
-
-    {
-        key: 'goated',
-        label: 'Goated',
-        sourceFile: 'goated',
-        proxyParam: 'gt',
-        timeout: 25000,
-        jitter: 500,
-        retries: 2,
-        multiUrl: true,
-        skipProxy: true,
     },
 
     {
@@ -217,6 +205,17 @@ export const SOURCES = [
     },
 
     {
+        key: 'lmscript',
+        label: 'LMScript',
+        sourceFile: 'lmscript',
+        proxyParam: 'lmsc',
+        timeout: 20000,
+        jitter: 500,
+        retries: 2,
+        multiUrl: true,
+    },
+
+    {
         key: 'lookmovie',
         label: 'LookMovie',
         sourceFile: 'lookmovie',
@@ -250,38 +249,6 @@ export const SOURCES = [
         retries: 2,
         multiUrl: true,
         skipProxy: true
-    },
-
-    {
-        key: 'nebula',
-        label: 'Nebula',
-        sourceFile: 'nebula',
-        proxyParam: 'nb',
-        timeout: 25000,
-        jitter: 500,
-        retries: 1,
-        multiUrl: true,
-        skipProxy: true,
-    },
-
-    {
-        key: 'nekowatch-sub',
-        sourceFile: 'nekowatch',
-        label: 'NekoWatch (Sub)',
-        proxyParam: 'nwsub',
-        timeout: 30000,
-        jitter: 500,
-        retries: 2
-    },
-
-    {
-        key: 'nekowatch-dub',
-        sourceFile: 'nekowatch',
-        label: 'NekoWatch (Dub)',
-        proxyParam: 'nwdub',
-        timeout: 30000,
-        jitter: 500,
-        retries: 2
     },
 
     {
@@ -332,6 +299,7 @@ export const SOURCES = [
         timeout: 20000,
         jitter: 500,
         retries: 2,
+        skipProxy: true
     },
 
     {
@@ -486,6 +454,17 @@ export const SOURCES = [
     },
 
     {
+        key: 'vidvault',
+        label: 'VidVault',
+        sourceFile: 'vidvault',
+        proxyParam: 'vv',
+        timeout: 25000,
+        jitter: 500,
+        retries: 2,
+        multiUrl: true,
+    },
+
+    {
         key: 'vidzee',
         label: 'VidZee',
         sourceFile: 'vidzee',
@@ -494,13 +473,13 @@ export const SOURCES = [
         sourcesTimeout: 10000,
         jitter: 400,
         retries: 3,
-        disabled: true, // Temporarily disabled because their site is down, all streams are returning 403's
         verifyHeaders: {
             Accept: '/',
             'Accept-Language': 'en-US,en;q=0.9',
             Referer: 'https://player.vidzee.wtf',
             Origin: 'https://player.vidzee.wtf',
         },
+        disabled: true // Disabled temporarily due to decryption issues
     },
 
     {

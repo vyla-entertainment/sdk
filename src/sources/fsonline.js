@@ -4,10 +4,10 @@ const ORIGIN = 'https://www3.fsonline.app';
 const AJAX_URL = `${ORIGIN}/wp-admin/admin-ajax.php`;
 const HEADERS = { 'User-Agent': USER_AGENT, 'Origin': ORIGIN, 'Referer': `${ORIGIN}/` };
 
-export async function getStream({ id, s, e }) {
+export async function getStream({ id, s, e, tmdbApiKey }) {
     try {
         const isTv = s != null && e != null;
-        const info = await getTmdbInfo(id, isTv ? 'tv' : 'movie');
+        const info = await getTmdbInfo(tmdbApiKey, id, isTv ? 'tv' : 'movie');
         if (!info?.titles?.length) return null;
         const searchHtml = await fetchText(`${ORIGIN}/?s=${encodeURIComponent(info.titles[0] + (info.year ? ' ' + info.year : ''))}`, { headers: HEADERS });
         const typeFolder = isTv ? 'seriale' : 'film';

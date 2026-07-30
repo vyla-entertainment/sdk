@@ -67,8 +67,7 @@ function cacheGet(cache, key) {
 
 function cacheSet(cache, key, val, ttl) { cache.set(key, { val, ts: Date.now(), ttl }); }
 
-export async function createStreamArgs(source, tmdbApiKey, id, s, e, clientIP=null) {
-    const getAbsoluteBase = host => (host.startsWith('localhost') || host.startsWith('127.0.0.1')) ? `http://${host}` : `https://${host}`;
+export async function createStreamArgs(source, tmdbApiKey, id, s, e, clientIP = null) {
     const audio = /dub$/.test(source.key) ? 'dub' : 'sub';
     return {
         id: id,
@@ -83,13 +82,25 @@ export async function createStreamArgs(source, tmdbApiKey, id, s, e, clientIP=nu
 }
 
 export async function validateTmdbId(tmdbApiKey, tmdbId, mediaType = 'movie') {
-    const key = `${tmdbId}-${mediaType}`;
+    let apiKey = tmdbApiKey;
+    let id = tmdbId;
+    let type = mediaType;
+    if (id === 'movie' || id === 'tv' || !id) {
+        if (apiKey && apiKey !== 'movie' && apiKey !== 'tv') {
+            type = id || 'movie';
+            id = apiKey;
+            apiKey = process.env.TMDB_API_KEY;
+        }
+    }
+    if (!apiKey) {
+        apiKey = process.env.TMDB_API_KEY;
+    }
+    const key = `${id}-${type}`;
     const cached = cacheGet(tmdbValidationCache, key);
     if (cached !== undefined) return cached;
-    const k = tmdbApiKey;
-    if (!k) return { valid: false, error: 'TMDB API key not configured' };
+    if (!apiKey) return { valid: false, error: 'TMDB API key not configured' };
     try {
-        const res = await fetch(`https://api.themoviedb.org/3/${mediaType}/${tmdbId}?api_key=${k}`, { signal: AbortSignal.timeout(5000) });
+        const res = await fetch(`https://api.themoviedb.org/3/${type}/${id}?api_key=${apiKey}`, { signal: AbortSignal.timeout(5000) });
         if (res.ok) {
             const data = await res.json();
             const isValid = !!(data?.id && (data?.title || data?.name));
@@ -108,15 +119,30 @@ export async function validateTmdbId(tmdbApiKey, tmdbId, mediaType = 'movie') {
 }
 
 export async function getTmdbInfo(tmdbApiKey, tmdbId, mediaType, season) {
-    const key = `${tmdbId}-${mediaType}-${season || ''}`;
+    let apiKey = tmdbApiKey;
+    let id = tmdbId;
+    let type = mediaType;
+    let s = season;
+    if (apiKey === 'movie' || apiKey === 'tv') {
+        type = apiKey;
+        id = tmdbId;
+        apiKey = process.env.TMDB_API_KEY;
+    } else if (id === 'movie' || id === 'tv') {
+        type = id;
+        id = apiKey;
+        apiKey = process.env.TMDB_API_KEY;
+    }
+    if (!apiKey) {
+        apiKey = process.env.TMDB_API_KEY;
+    }
+    const key = `${id}-${type}-${s || ''}`;
     const cached = cacheGet(tmdbInfoCache, key);
     if (cached !== undefined) return cached;
-    const k = tmdbApiKey;
-    if (!k) return { isAnime: false, titles: [], year: null, imdbId: null };
+    if (!apiKey) return { isAnime: false, titles: [], year: null, imdbId: null };
     try {
         const [mainRes, seasonRes] = await Promise.all([
-            fetch(`https://api.themoviedb.org/3/${mediaType}/${tmdbId}?api_key=${k}&append_to_response=external_ids`, { signal: AbortSignal.timeout(5000) }),
-            season && mediaType === 'tv' ? fetch(`https://api.themoviedb.org/3/tv/${tmdbId}/season/${season}?api_key=${k}`, { signal: AbortSignal.timeout(5000) }) : Promise.resolve(null),
+            fetch(`https://api.themoviedb.org/3/${type}/${id}?api_key=${apiKey}&append_to_response=external_ids`, { signal: AbortSignal.timeout(5000) }),
+            s && type === 'tv' ? fetch(`https://api.themoviedb.org/3/tv/${id}/season/${s}?api_key=${apiKey}`, { signal: AbortSignal.timeout(5000) }) : Promise.resolve(null),
         ]);
         let mainData = null, seasonData = null;
         if (mainRes.ok) mainData = await mainRes.json(); else mainRes.body?.cancel();
@@ -125,10 +151,10 @@ export async function getTmdbInfo(tmdbApiKey, tmdbId, mediaType, season) {
         const isAnime = genres.some(g => g.id === 16) && ((mainData?.origin_country || []).includes('JP') || mainData?.original_language === 'ja');
         const titles = [];
         if (seasonData?.name) titles.push(seasonData.name);
-        const t = mainData?.title || mainData?.name || '';
+        const titleText = mainData?.title || mainData?.name || '';
         const ot = mainData?.original_title || mainData?.original_name || '';
-        if (t) titles.push(t);
-        if (ot && ot !== t) titles.push(ot);
+        if (titleText) titles.push(titleText);
+        if (ot && ot !== titleText) titles.push(ot);
         const dateStr = seasonData?.air_date || mainData?.release_date || mainData?.first_air_date || '';
         const result = { isAnime, titles: [...new Set(titles.filter(Boolean))], year: dateStr ? parseInt(dateStr.slice(0, 4), 10) : null, imdbId: mainData?.imdb_id || mainData?.external_ids?.imdb_id || null };
         cacheSet(tmdbInfoCache, key, result, 600000);
@@ -178,16 +204,26 @@ export async function tmdbToAnilist(tmdbId, mediaType, season, titles = [], year
 }
 
 export async function imdbToTmdb(tmdbApiKey, imdbId, mediaType = 'movie') {
-    const key = `imdb-${imdbId}`;
+    let apiKey = tmdbApiKey;
+    let id = imdbId;
+    let type = mediaType;
+    if (id === 'movie' || id === 'tv') {
+        type = id;
+        id = apiKey;
+        apiKey = process.env.TMDB_API_KEY;
+    }
+    if (!apiKey) {
+        apiKey = process.env.TMDB_API_KEY;
+    }
+    const key = `imdb-${id}`;
     const cached = cacheGet(tmdbInfoCache, key);
     if (cached !== undefined) return cached;
-    const k = tmdbApiKey;
-    if (!k) return null;
+    if (!apiKey) return null;
     try {
-        const data = await fetchJson(`https://api.themoviedb.org/3/find/${imdbId}?api_key=${k}&external_source=imdb_id`, { signal: AbortSignal.timeout(5000) });
+        const data = await fetchJson(`https://api.themoviedb.org/3/find/${id}?api_key=${apiKey}&external_source=imdb_id`, { signal: AbortSignal.timeout(5000) });
         let result = null;
-        if (mediaType === 'movie' && data.movie_results?.length) result = data.movie_results[0].id;
-        else if (mediaType === 'tv' && data.tv_results?.length) result = data.tv_results[0].id;
+        if (type === 'movie' && data.movie_results?.length) result = data.movie_results[0].id;
+        else if (type === 'tv' && data.tv_results?.length) result = data.tv_results[0].id;
         if (result) cacheSet(tmdbInfoCache, key, result, 600000);
         return result;
     } catch { return null; }
