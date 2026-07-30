@@ -95,7 +95,7 @@ export default class VylaSDK {
         s?: number | null,
         e?: number | null,
         clientIP?: string | null
-    ): Promise<{allUrls: StreamResult[]}>;
+    ): Promise<StreamResult | {allUrls: StreamResult[]}>;
 
     /**
      * Get subtitles for a movie or TV episode.
