@@ -13,8 +13,6 @@ pnpm install @vyla-entertainment/sdk
 
 View our full documentation at https://docs.vyla.cc/sdk
 
-```
-
 # [DMCA](https://docs.vyla.cc/misc/dmca)
 
 If your source is listed here, I sincerely apologize. I understand that its inclusion may be costing you a lot of money, and that was never my intention. Please contact me as soon as possible, and I'll remove it ASAP.
