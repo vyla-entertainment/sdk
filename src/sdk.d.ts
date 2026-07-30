@@ -59,6 +59,7 @@ export interface VylaSDKOptions {
     tmdbApiKey?: string;
 }
 
+// Descriptions written with Claude.
 export default class VylaSDK {
     tmdbApiKey?: string;
 
@@ -94,7 +95,7 @@ export default class VylaSDK {
         s?: number | null,
         e?: number | null,
         clientIP?: string | null
-    ): Promise<StreamResult | {allUrls: StreamResult[]}>;
+    ): Promise<StreamResult | { allUrls: StreamResult[] }>;
 
     /**
      * Get subtitles for a movie or TV episode.
