@@ -13,15 +13,8 @@ const HEADERS = {
 };
 
 const SERVERS = [
-    'pseudo',
-    'lynx',
     'tik',
-    'ipcloud',
-    'v4:English',
-    'turkce',
-    'v5:Hindi',
-    'v4:Hindi',
-    'v6:Hindi'
+    'hindiv3'
 ];
 
 const TIMEOUT_MS = 15000;

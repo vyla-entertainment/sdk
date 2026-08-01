@@ -479,7 +479,6 @@ export const SOURCES = [
             Referer: 'https://player.vidzee.wtf',
             Origin: 'https://player.vidzee.wtf',
         },
-        disabled: true // Disabled temporarily due to decryption issues
     },
 
     {

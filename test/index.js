@@ -18,7 +18,7 @@ const CONFIG = {
 
     TEST_SUBTITLE: false,         // Toggle subtitle testing
     TEST_DOWNLOAD: false,         // Toggle download testing
-    TEST_MOVIE: false,            // Toggle movie testing
+    TEST_MOVIE: true,            // Toggle movie testing
     TEST_TV: true                // Toggle TV testing
 };
 
