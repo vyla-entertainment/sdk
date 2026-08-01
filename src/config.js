@@ -15,6 +15,7 @@ export const SOURCES = [
         jitter: 500,
         retries: 2,
         multiUrl: true,
+        skipProxy: true,
     },
 
     {
