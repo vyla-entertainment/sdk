@@ -3,7 +3,6 @@ import { getUA } from './utils/helpers.js';
 const SUBTITLE_BASES = [
     'https://sub.vdrk.site/v1',
     'https://sub.vdrk.site/v2',
-    'https://fed-subs.pstream.mov'
 ];
 const VYLIAN_MESSAGES = [
     "Thanks for using Vyla!"
@@ -61,23 +60,6 @@ export async function fetchSubtitles(paths = []) {
                                 source: 'v2'
                             }))
                             : [];
-                    }
-
-                    if (base.includes('fed-subs.pstream.mov')) {
-                        if (!data?.subtitles || typeof data.subtitles !== 'object') return [];
-
-                        return Object.entries(data.subtitles)
-                            .map(([language, sub]) => {
-                                if (!sub?.subtitle_link) return null;
-                                const ext = sub.subtitle_link.split('.').pop()?.toLowerCase();
-                                return {
-                                    label: sub.subtitle_name || language,
-                                    file: sub.subtitle_link,
-                                    type: ext === 'vtt' ? 'vtt' : 'srt',
-                                    source: 'febbox'
-                                };
-                            })
-                            .filter(Boolean);
                     }
 
                     const v1 = Array.isArray(data) ? data : [];
