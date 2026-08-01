@@ -14,7 +14,7 @@ const CONFIG = {
     TV_ID: "37854",               // TV TMDB ID to test, for anime I recommend using a random ID like 37854
     TV_SEASON: "1",              // TV Season to test
     TV_EPISODE: "1",             // TV Episode to test
-    STREAM_SOURCE: "",    // Source key to test
+    STREAM_SOURCE: "hexa",    // Source key to test
 
     TEST_SUBTITLE: false,         // Toggle subtitle testing
     TEST_DOWNLOAD: false,         // Toggle download testing

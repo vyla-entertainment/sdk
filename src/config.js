@@ -127,6 +127,25 @@ export const SOURCES = [
     },
 
     {
+        key: 'cinesu',
+        label: 'CineSu',
+        sourceFile: 'cinesu',
+        proxyParam: 'cs',
+        timeout: 20000,
+        jitter: 500,
+        retries: 2,
+        multiUrl: false,
+        skipProxy: true,
+        cdnHeaders: [{
+            pattern: /glendale-plumbing\.com/i,
+            headers: {
+                Referer: 'https://cine.su/',
+                Origin: 'https://cine.su',
+            },
+        }],
+    },
+
+    {
         key: 'flaxmovies',
         label: 'FlaxMovies',
         sourceFile: 'flaxmovies',
