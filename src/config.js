@@ -61,6 +61,30 @@ export const SOURCES = [
     },
 
     {
+        key: 'anikoto-sub',
+        label: 'AniKoto (Sub)',
+        sourceFile: 'anikoto',
+        proxyParam: 'aksub',
+        timeout: 25000,
+        jitter: 500,
+        retries: 2,
+        multiUrl: true,
+        skipProxy: true
+    },
+
+    {
+        key: 'anikoto-dub',
+        label: 'AniKoto (Dub)',
+        sourceFile: 'anikoto',
+        proxyParam: 'akdub',
+        timeout: 25000,
+        jitter: 500,
+        retries: 2,
+        multiUrl: true,
+        skipProxy: true
+    },
+
+    {
         key: 'anineko-sub',
         sourceFile: 'anineko',
         label: 'AniNeko (Sub)',
@@ -112,6 +136,18 @@ export const SOURCES = [
             Referer: 'https://ani.pm/',
             Origin: 'https://ani.pm',
         },
+    },
+
+    {
+        key: 'anizone',
+        label: 'AniZone',
+        sourceFile: 'anizone',
+        proxyParam: 'az',
+        timeout: 25000,
+        jitter: 500,
+        retries: 2,
+        multiUrl: true,
+        skipProxy: true
     },
 
     {
@@ -211,6 +247,18 @@ export const SOURCES = [
         timeout: 20000,
         jitter: 500,
         retries: 2,
+    },
+
+    {
+        key: 'kickassanime',
+        label: 'KickAssAnime',
+        sourceFile: 'kickassanime',
+        proxyParam: 'kaa',
+        timeout: 25000,
+        jitter: 500,
+        retries: 2,
+        multiUrl: true,
+        skipProxy: true
     },
 
     {
@@ -317,6 +365,30 @@ export const SOURCES = [
         timeout: 20000,
         jitter: 500,
         retries: 2,
+        skipProxy: true
+    },
+
+    {
+        key: 'reanime-sub',
+        label: 'Reanime (Sub)',
+        sourceFile: 'reanime',
+        proxyParam: 'resub',
+        timeout: 25000,
+        jitter: 500,
+        retries: 2,
+        multiUrl: true,
+        skipProxy: true
+    },
+    
+    {
+        key: 'reanime-dub',
+        label: 'Reanime (Dub)',
+        sourceFile: 'reanime',
+        proxyParam: 'redub',
+        timeout: 25000,
+        jitter: 500,
+        retries: 2,
+        multiUrl: true,
         skipProxy: true
     },
 
