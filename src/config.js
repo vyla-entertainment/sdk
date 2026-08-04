@@ -160,7 +160,13 @@ export const SOURCES = [
         jitter: 500,
         retries: 1,
         multiUrl: true,
-        skipProxy: true,
+        cdnHeaders: [{
+            pattern: /help\.earthcleaner\.cc/i,
+            headers: {
+                Referer: 'https://cinejoy.to/',
+                Origin: 'https://cinejoy.to',
+            },
+        }],
     },
 
     {
@@ -380,7 +386,7 @@ export const SOURCES = [
         multiUrl: true,
         skipProxy: true
     },
-    
+
     {
         key: 'reanime-dub',
         label: 'Reanime (Dub)',
